@@ -14,51 +14,46 @@ Everything is scanned read-only up front. Nothing is uninstalled until you expli
 
 ## Install
 
-Clone or copy this directory, then from inside it:
+pkg-cleaner is published on npm: **https://www.npmjs.com/package/pkg-cleaner**
 
 ```bash
-npm install
-npm run build
+npm install -g pkg-cleaner
 ```
 
-This produces `dist/cli.js`. Install it as a global command with either:
-
-```bash
-# Option A: npm link (symlinks the package into your global npm bin)
-npm link
-
-# Option B: install directly from the local folder
-npm install -g .
-```
-
-Either way you get a `pkg-cleaner` command on your PATH. Run it with:
+That gives you a `pkg-cleaner` command on your `PATH`. Run it with:
 
 ```bash
 pkg-cleaner
 ```
 
-To uninstall the CLI itself later: `npm uninstall -g pkg-cleaner` (or `npm unlink` if you used `npm link`).
+To uninstall the CLI itself later: `npm uninstall -g pkg-cleaner`.
 
-#### If `npm link` / `npm install -g .` fails with `EACCES`
+#### If that fails with `EACCES`
 
 This happens when your npm global prefix (check with `npm config get prefix`) is a
 root-owned directory — common on Macs where Node was installed via the official
-`.pkg` installer (prefix defaults to `/usr/local`). This tool deliberately never
-runs `sudo` on your behalf, so pick one of:
+`.pkg` installer (prefix defaults to `/usr/local`). This tool's own uninstall logic
+deliberately never runs `sudo` on your behalf, and neither should installing it, so
+pick one of:
 
 - **Recommended**: point npm at a user-owned prefix instead, e.g.
   `npm config set prefix ~/.npm-global`, add `~/.npm-global/bin` to your `PATH`,
-  then re-run `npm install -g .`. This fixes the issue for all future global
-  npm installs, not just this one.
-- Skip the global install entirely and run the built file directly:
-  `node "$(pwd)/dist/cli.js"`, or add a shell alias
-  `alias pkg-cleaner='node /absolute/path/to/dist/cli.js'` to your `~/.zshrc`.
+  then re-run `npm install -g pkg-cleaner`. This fixes the issue for all future
+  global npm installs, not just this one.
+- Run it via `npx` without a global install: `npx pkg-cleaner`.
 
-### Development
+### Building from source
+
+Only needed if you want to modify the code, not for normal use:
 
 ```bash
-npm run dev        # run directly from TypeScript source via tsx, no build step
-npm run typecheck   # tsc --noEmit
+git clone https://github.com/GurjitGora/PKG-Cleaner.git
+cd PKG-Cleaner
+npm install
+npm run build        # produces dist/cli.js
+npm run dev          # or: run directly from TypeScript source via tsx, no build step
+npm run typecheck    # tsc --noEmit
+npm install -g .     # install your local build globally instead of the npm one
 ```
 
 ## Using the TUI
