@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    # macOS-only on purpose: package.json declares "os": ["darwin"], so npm
+    # refuses to install this project's own deps on a non-mac runner without
+    # --force. Running on macos-latest also lets the smoke test below exercise
+    # the real target platform instead of a platform we don't support.
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+      # Deliberately not testing the interactive Ink UI here: it needs a real
+      # TTY, and GitHub Actions runners don't attach one to job steps.
+      # `script` can allocate a pty locally, but on the hosted macOS runner it
+      # produced ~4 bytes of output before this step's timeout — chasing pty
+      # emulation quirks in CI infra tests the runner, not our code. The two
+      # checks below exercise the same startup code path (arg parsing, own
+      # package.json resolution) without needing a TTY at all; the actual
+      # interactive rendering is covered by manual testing before release.
+      - name: Smoke test — --version and --help
+        run: |
+          node dist/cli.js --version
+          node dist/cli.js --help | grep -q "pkg-cleaner" || (echo "::error::--help output missing expected text" && exit 1)

@@ -1,6 +1,6 @@
 {
   "name": "pkg-cleaner",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Terminal UI to audit and uninstall Homebrew/npm/gem/pip/pipx/SDKMAN packages plus Claude Code, Cursor, and GitHub Copilot skills, agents, plugins, MCP servers, and extensions.",
   "license": "MIT",
   "repository": {
@@ -38,7 +38,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/cli.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {
     "ink": "^5.0.1",

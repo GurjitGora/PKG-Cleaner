@@ -1,5 +1,8 @@
 # pkg-cleaner
 
+[![CI](https://github.com/GurjitGora/PKG-Cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/GurjitGora/PKG-Cleaner/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/pkg-cleaner.svg)](https://www.npmjs.com/package/pkg-cleaner)
+
 A terminal UI (TUI) for auditing and uninstalling clutter on **macOS**:
 
 - **Package managers**: Homebrew (formulae + casks), npm (global), RubyGems, pip (system), pipx, SDKMAN!
@@ -23,7 +26,9 @@ npm install -g pkg-cleaner
 That gives you a `pkg-cleaner` command on your `PATH`. Run it with:
 
 ```bash
-pkg-cleaner
+pkg-cleaner            # launch the interactive TUI
+pkg-cleaner --version  # print the installed version
+pkg-cleaner --help     # usage info
 ```
 
 To uninstall the CLI itself later: `npm uninstall -g pkg-cleaner`.
@@ -64,11 +69,24 @@ npm install -g .     # install your local build globally instead of the npm one
 - **a** — select all items currently visible (respects any active search filter)
 - **c** — clear the selection
 - **/** — search/filter the current tab by name or description; **Esc** clears it, **Enter** stops editing
+- **i** — pin/hide the highlighted item so it stops showing up by default (see "Ignore list" below)
+- **I** — toggle showing items you've hidden with `i`
 - **Enter** — go to the confirmation screen for your selection (or just the highlighted item if nothing is selected)
 - **r** — rescan everything
-- **q** / **Ctrl+C** — quit
+- **q** — quit (from the browse screen only)
+- **Ctrl+C** — force quit from *any* screen, including mid-uninstall, if something hangs
 
 The confirmation screen lists the literal command or file action about to run for every item — nothing happens silently.
+
+Each row also shows a relative "last touched" age where it's known (Claude Code / Cursor skills and subagents use the entry file's modified time; VS Code / Cursor extensions use the editor's own install timestamp) — useful for spotting things you haven't touched in a year versus something you set up yesterday.
+
+### Ignore list
+
+Press `i` on any item to hide it from the default view — handy for things you've already decided to keep (your own active skills, a package you know you still need) so they stop cluttering re-scans. It's a *hide*, not a *protect*: press `I` to reveal hidden items again, and you can still select and uninstall them from that view. The list persists to `~/.config/pkg-cleaner/config.json`.
+
+### Update notifications
+
+On startup, pkg-cleaner does a quick (2s timeout, silent-on-failure) check against the npm registry and shows a banner if a newer version is published. This never blocks or slows down scanning — if you're offline, nothing happens.
 
 ## Safety model
 

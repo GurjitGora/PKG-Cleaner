@@ -9,7 +9,7 @@ interface ExtensionManifestEntry {
   identifier: { id: string };
   version: string;
   location?: { path?: string };
-  metadata?: { publisherDisplayName?: string };
+  metadata?: { publisherDisplayName?: string; installedTimestamp?: number };
 }
 
 interface EditorTarget {
@@ -91,6 +91,10 @@ function makeExtensionSource(target: EditorTarget): Source {
             ? sizes.reduce<number>((sum, s) => sum + (s ?? 0), 0)
             : undefined;
           const versions = Array.from(new Set(entries.map((e) => e.version)));
+          const timestamps = entries
+            .map((e) => e.metadata?.installedTimestamp)
+            .filter((t): t is number => typeof t === "number");
+          const installedAt = timestamps.length > 0 ? Math.max(...timestamps) : undefined;
           const copilot = isCopilot(id);
           const manualOnly = !cli;
           const uninstallPreview = cli
@@ -105,6 +109,7 @@ function makeExtensionSource(target: EditorTarget): Source {
             detail: entries[0].metadata?.publisherDisplayName ?? target.label,
             sizeBytes,
             path: paths[0],
+            installedAt,
             manualOnly,
             uninstallPreview,
             payload: { id, paths },

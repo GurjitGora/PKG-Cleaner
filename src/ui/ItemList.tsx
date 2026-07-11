@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { Box, Text } from "ink";
 import type { Item } from "../lib/types.js";
 import { formatBytes } from "../lib/fsSize.js";
+import { formatRelativeAge } from "../lib/time.js";
 
 export function ItemList({
   items,
@@ -9,12 +10,14 @@ export function ItemList({
   selected,
   windowSize,
   sourceLabels,
+  ignoredIds,
 }: {
   items: Item[];
   cursorIndex: number;
   selected: Set<string>;
   windowSize: number;
   sourceLabels: Record<string, string>;
+  ignoredIds: Set<string>;
 }): ReactElement {
   if (items.length === 0) {
     return (
@@ -37,16 +40,21 @@ export function ItemList({
         const idx = start + i;
         const isCursor = idx === cursorIndex;
         const isSelected = selected.has(item.id);
+        const isIgnored = ignoredIds.has(item.id);
         const checkbox = isSelected ? "[x]" : "[ ]";
         const cursorMark = isCursor ? ">" : " ";
         const sizeStr = formatBytes(item.sizeBytes);
+        const ageStr = formatRelativeAge(item.installedAt);
         const tag = sourceLabels[item.source] ?? item.source;
         return (
           <Box key={item.id}>
-            <Text color={isCursor ? "cyan" : undefined} inverse={isCursor}>
+            <Text color={isCursor ? "cyan" : undefined} inverse={isCursor} dimColor={isIgnored && !isCursor}>
               {cursorMark} {checkbox} {item.name.padEnd(38).slice(0, 38)}{" "}
-              {(item.version ?? "").padEnd(14).slice(0, 14)} {sizeStr.padEnd(9)}{" "}
-              <Text dimColor>[{tag}]{item.manualOnly ? " (manual only)" : ""}</Text>
+              {(item.version ?? "").padEnd(14).slice(0, 14)} {sizeStr.padEnd(9)} {ageStr.padEnd(8)}{" "}
+              <Text dimColor>
+                [{tag}]{item.manualOnly ? " (manual only)" : ""}
+                {isIgnored ? " (ignored)" : ""}
+              </Text>
             </Text>
           </Box>
         );

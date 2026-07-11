@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { Box, Text, useApp, useInput, useStdout } from "ink";
 import { ALL_SOURCES } from "../sources/registry.js";
 import type { GroupName, Item, UninstallResult } from "../lib/types.js";
+import { loadConfig, saveConfig } from "../lib/config.js";
+import { getOwnVersion } from "../lib/version.js";
+import { checkForUpdate } from "../lib/updateCheck.js";
 import { Spinner } from "./Spinner.js";
 import { CategoryTabs } from "./CategoryTabs.js";
 import { ItemList } from "./ItemList.js";
@@ -32,6 +35,10 @@ export function App(): ReactElement {
   const [results, setResults] = useState<UninstallResult[]>([]);
   const [runningName, setRunningName] = useState<string | undefined>();
   const [rows, setRows] = useState(stdout?.rows ?? 24);
+  const [ignoredIds, setIgnoredIds] = useState<Set<string>>(new Set());
+  const [showIgnored, setShowIgnored] = useState(false);
+  const [configError, setConfigError] = useState<string | undefined>();
+  const [updateVersion, setUpdateVersion] = useState<string | undefined>();
 
   useEffect(() => {
     const onResize = () => setRows(stdout?.rows ?? 24);
@@ -40,6 +47,28 @@ export function App(): ReactElement {
       stdout?.off("resize", onResize);
     };
   }, [stdout]);
+
+  useEffect(() => {
+    void loadConfig().then((config) => setIgnoredIds(new Set(config.ignore)));
+  }, []);
+
+  useEffect(() => {
+    const current = getOwnVersion();
+    if (!current) return;
+    void checkForUpdate(current).then(setUpdateVersion);
+  }, []);
+
+  function toggleIgnore(item: Item) {
+    setIgnoredIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(item.id)) next.delete(item.id);
+      else next.add(item.id);
+      void saveConfig({ ignore: Array.from(next) }).catch((err) =>
+        setConfigError(`Failed to save ignore list: ${String(err)}`)
+      );
+      return next;
+    });
+  }
 
   async function scan() {
     setScreen("scanning");
@@ -65,8 +94,14 @@ export function App(): ReactElement {
     const q = searchQuery.trim().toLowerCase();
     return items
       .filter((i) => i.group === activeGroup)
+      .filter((i) => showIgnored || !ignoredIds.has(i.id))
       .filter((i) => (q ? `${i.name} ${i.detail ?? ""}`.toLowerCase().includes(q) : true));
-  }, [items, activeGroup, searchQuery]);
+  }, [items, activeGroup, searchQuery, ignoredIds, showIgnored]);
+
+  const hiddenInGroupCount = useMemo(
+    () => items.filter((i) => i.group === activeGroup && ignoredIds.has(i.id)).length,
+    [items, activeGroup, ignoredIds]
+  );
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -75,6 +110,15 @@ export function App(): ReactElement {
   }, [items]);
 
   useInput((input, key) => {
+    // Ink's raw mode intercepts Ctrl+C as a normal keypress rather than a
+    // real SIGINT, so without an unconditional handler here a hung
+    // uninstall command (screen === "running", which has no key branch of
+    // its own) would leave the user with no way to get their terminal back.
+    if (key.ctrl && input === "c") {
+      exit();
+      return;
+    }
+
     if (screen === "scanning") return;
 
     if (screen === "browse") {
@@ -101,7 +145,7 @@ export function App(): ReactElement {
         return;
       }
 
-      if (input === "q" || (key.ctrl && input === "c")) {
+      if (input === "q") {
         exit();
         return;
       }
@@ -157,6 +201,17 @@ export function App(): ReactElement {
       }
       if (input === "c") {
         setSelected(new Set());
+        return;
+      }
+      if (input === "i") {
+        const item = filteredItems[cursorIndex];
+        if (!item) return;
+        toggleIgnore(item);
+        return;
+      }
+      if (input === "I") {
+        setShowIgnored((v) => !v);
+        setCursorIndex(0);
         return;
       }
       if (key.return) {
@@ -226,6 +281,12 @@ export function App(): ReactElement {
         pkg-cleaner — macOS package & AI-tooling uninstaller
       </Text>
 
+      {updateVersion && (
+        <Text color="yellow">
+          Update available: v{updateVersion} — run `npm install -g pkg-cleaner` to upgrade
+        </Text>
+      )}
+
       {screen === "scanning" && (
         <Box marginTop={1}>
           <Text>
@@ -240,13 +301,14 @@ export function App(): ReactElement {
             <CategoryTabs groups={GROUPS} active={activeGroup} counts={counts} />
           </Box>
 
-          {scanErrors.length > 0 && screen === "browse" && (
+          {(scanErrors.length > 0 || configError) && screen === "browse" && (
             <Box marginTop={1} flexDirection="column">
               {scanErrors.map((e) => (
                 <Text key={e} color="red">
                   ! {e}
                 </Text>
               ))}
+              {configError && <Text color="red">! {configError}</Text>}
             </Box>
           )}
 
@@ -264,13 +326,26 @@ export function App(): ReactElement {
                   selected={selected}
                   windowSize={listWindow}
                   sourceLabels={SOURCE_LABELS}
+                  ignoredIds={ignoredIds}
                 />
               </Box>
+              {hiddenInGroupCount > 0 && (
+                <Box marginTop={1}>
+                  <Text dimColor>
+                    {showIgnored
+                      ? `Showing ${hiddenInGroupCount} ignored item${hiddenInGroupCount === 1 ? "" : "s"} in this tab (I to hide again)`
+                      : `${hiddenInGroupCount} ignored item${hiddenInGroupCount === 1 ? "" : "s"} hidden in this tab (I to show)`}
+                  </Text>
+                </Box>
+              )}
               <Box marginTop={1} flexDirection="column">
                 <Text dimColor>
                   ↑↓ move · ←→ switch tab · space select · a select-all · c clear · / search · r rescan
                 </Text>
-                <Text dimColor>enter uninstall selected ({selected.size}) or current item · q quit</Text>
+                <Text dimColor>
+                  i ignore/unignore · I show/hide ignored · enter uninstall selected ({selected.size}) or current
+                  item · q / Ctrl+C quit
+                </Text>
               </Box>
             </>
           )}

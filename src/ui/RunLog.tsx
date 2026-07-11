@@ -31,9 +31,13 @@ export function RunLog({
           </Text>
         )}
       </Box>
-      {finished && (
+      {finished ? (
         <Box marginTop={1}>
           <Text dimColor>Press any key to return to the list (rescans affected sources).</Text>
+        </Box>
+      ) : (
+        <Box marginTop={1}>
+          <Text dimColor>Ctrl+C to force quit if something hangs (in-flight command is not rolled back).</Text>
         </Box>
       )}
     </Box>

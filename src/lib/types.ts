@@ -32,6 +32,8 @@ export interface Item {
   sizeBytes?: number;
   /** Filesystem path this item lives at, if any. */
   path?: string;
+  /** Epoch ms this item was last modified/installed, if known — used for a relative-age hint. */
+  installedAt?: number;
   /** True when this item cannot be safely automated (e.g. no editor CLI found). */
   manualOnly?: boolean;
   /** Shown in the confirm screen: the literal command or action about to run. */

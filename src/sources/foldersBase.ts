@@ -26,7 +26,7 @@ export function makeDirSkillSource(opts: FolderSourceOpts): Source {
       if (!existsSync(opts.rootDir)) return [];
       const entries = await fs.readdir(opts.rootDir, { withFileTypes: true }).catch(() => []);
 
-      type Pending = { name: string; dirPath: string; description?: string };
+      type Pending = { name: string; dirPath: string; description?: string; installedAt?: number };
       const pending: Pending[] = [];
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
@@ -34,13 +34,15 @@ export function makeDirSkillSource(opts: FolderSourceOpts): Source {
         const entryFilePath = path.join(dirPath, opts.entryFile);
         if (!existsSync(entryFilePath)) continue;
         let description: string | undefined;
+        let installedAt: number | undefined;
         try {
           const content = await fs.readFile(entryFilePath, "utf8");
           description = extractFrontmatterDescription(content);
+          installedAt = (await fs.stat(entryFilePath)).mtimeMs;
         } catch {
           // unreadable entry file, still list the folder
         }
-        pending.push({ name: entry.name, dirPath, description });
+        pending.push({ name: entry.name, dirPath, description, installedAt });
       }
 
       const sizes = await dirSizesBytes(pending.map((p) => p.dirPath));
@@ -52,6 +54,7 @@ export function makeDirSkillSource(opts: FolderSourceOpts): Source {
         detail: p.description ?? opts.detailPrefix,
         sizeBytes: sizes.get(p.dirPath),
         path: p.dirPath,
+        installedAt: p.installedAt,
         uninstallPreview: `Move to Trash: ${p.dirPath}`,
       }));
     },
@@ -102,6 +105,7 @@ export function makeFlatFileSource(opts: FlatFileSourceOpts): Source {
           detail: description ?? opts.detailPrefix,
           sizeBytes: stat?.size,
           path: filePath,
+          installedAt: stat?.mtimeMs,
           uninstallPreview: `Move to Trash: ${filePath}`,
         });
       }
