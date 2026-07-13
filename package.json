@@ -1,8 +1,8 @@
 {
   "name": "pkg-cleaner",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Terminal UI to audit and uninstall Homebrew/npm/gem/pip/pipx/SDKMAN packages plus Claude Code, Cursor, and GitHub Copilot skills, agents, plugins, MCP servers, and extensions.",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GurjitGora/PKG-Cleaner.git"

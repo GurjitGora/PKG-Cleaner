@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/GurjitGora/PKG-Cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/GurjitGora/PKG-Cleaner/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/pkg-cleaner.svg)](https://www.npmjs.com/package/pkg-cleaner)
+[![License](https://img.shields.io/badge/license-proprietary-red.svg)](LICENSE)
 
 A terminal UI (TUI) for auditing and uninstalling clutter on **macOS**:
 
@@ -113,3 +114,7 @@ src/
 ```
 
 To add a new package manager or AI-tool source, add a file under `src/sources/` that exports a `Source` (see `src/lib/types.ts`), then register it in `src/sources/registry.ts`.
+
+## License
+
+All rights reserved — see [LICENSE](LICENSE). Versions published before 2026-07-12 (`0.1.0`–`0.2.0`) were released under the MIT License and remain available under those terms for anyone who obtained them; that grant isn't retroactively revoked. `0.2.1` onward is proprietary: no copying, redistribution, or resale without permission.
