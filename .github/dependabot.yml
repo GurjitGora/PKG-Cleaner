@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # npm dependencies (ink, react, tsup, tsx, typescript, etc.) — catches
+  # exactly the kind of transitive CVE (esbuild via tsup) fixed manually
+  # today, plus routine version drift, on an ongoing basis.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+
+  # GitHub Actions used in .github/workflows/ci.yml (actions/checkout,
+  # actions/setup-node) — catches deprecation/runtime-version issues like
+  # the Node 20 warning fixed manually earlier in this project.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"
