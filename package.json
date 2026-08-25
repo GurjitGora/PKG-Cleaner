@@ -42,7 +42,7 @@
     "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {
-    "ink": "^6.8.0",
+    "ink": "^7.1.1",
     "react": "^19.2.8"
   },
   "devDependencies": {
