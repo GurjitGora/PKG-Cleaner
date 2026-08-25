@@ -1,13 +1,31 @@
-All Rights Reserved
+Proprietary License — Use Permitted, Copying Prohibited
 
-Copyright (c) 2026 Gurjit Singh
+Copyright (c) 2026 Gurjit Singh. All rights reserved.
 
 This software and associated documentation files (the "Software") are the
-proprietary property of the copyright holder. All rights are reserved.
+proprietary property of the copyright holder. This license grants a limited
+right to use the Software; it does not transfer ownership or grant any
+right to copy, redistribute, or resell it.
 
-No part of the Software may be copied, modified, merged, published,
-distributed, sublicensed, sold, or otherwise used, in whole or in part,
-without the prior written permission of the copyright holder.
+Permitted:
+- Installing and running the Software for its intended purpose, obtained
+  through an official distribution channel (e.g., the npm registry), free
+  of charge, for personal or internal use.
+
+Not permitted, without the prior written permission of the copyright
+holder:
+- Copying, reproducing, or redistributing the source code or compiled
+  output, in whole or in part
+- Modifying the Software and distributing or publishing your modified
+  version
+- Repackaging, mirroring, sublicensing, selling, or otherwise making the
+  Software available to third parties through any channel other than the
+  original official distribution
+- Using the source code, in whole or in part, to create a derivative or
+  competing product
+
+Unauthorized copying, modification, or distribution of this Software is a
+violation of copyright law and may result in legal action.
 
 Versions of this Software published before 2026-07-12 were made available
 under the MIT License. That prior grant is irrevocable for the specific

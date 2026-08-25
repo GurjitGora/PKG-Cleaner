@@ -117,4 +117,4 @@ To add a new package manager or AI-tool source, add a file under `src/sources/` 
 
 ## License
 
-All rights reserved — see [LICENSE](LICENSE). Versions published before 2026-07-12 (`0.1.0`–`0.2.0`) were released under the MIT License and remain available under those terms for anyone who obtained them; that grant isn't retroactively revoked. `0.2.1` onward is proprietary: no copying, redistribution, or resale without permission.
+Proprietary — see [LICENSE](LICENSE) for the full terms. In short: **free to install and use** via the official npm package, but the source code may not be copied, redistributed, modified-and-republished, or resold without permission. Versions published before 2026-07-12 (`0.1.0`–`0.2.0`) were released under the MIT License and remain available under those terms for anyone who obtained them; that grant isn't retroactively revoked. `0.2.1` onward is proprietary.

@@ -3,6 +3,19 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.1] - 2026-08-25
+
+### Changed
+- **Clarified LICENSE terms.** The previous "All Rights Reserved" wording
+  technically prohibited even normal use ("may not be... used... without
+  permission"), which was broader than intended. Now explicit: installing
+  and running the software via the official npm package is free and
+  permitted; copying, redistributing, modifying-and-republishing, or
+  reselling the source or compiled output is not, without permission.
+  `package.json`'s `license` field stays `UNLICENSED` (still the correct
+  npm convention — there's no standard SPDX identifier for "free to use,
+  no redistribution"; the actual terms live in the LICENSE file text).
+
 ## [0.3.0] - 2026-08-25
 
 ### Changed
