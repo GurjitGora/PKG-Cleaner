@@ -14,7 +14,7 @@ Everything is scanned read-only up front. Nothing is uninstalled until you expli
 ## Requirements
 
 - macOS (this tool shells out to `osascript`/Finder for Trash support and is not cross-platform)
-- Node.js >= 18
+- Node.js >= 20
 
 ## Install
 
